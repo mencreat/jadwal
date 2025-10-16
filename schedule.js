@@ -65,13 +65,29 @@ async function main() {
 
     if (await isSent(code)) continue;
 
-    const discordPayload = {
-      content: `## 📢 New Release Content Crot!
-🎬 **${title}**
-🔗 https://videyb.com/e/${code}
-![cover](${thumbnail})
+//     const discordPayload = {
+//       content: `## 📢 New Release Content Crot!
+// 🎬 **${title}**
+// 🔗 https://videyb.com/e/${code}
+// ![cover](${thumbnail})
 
-|| <@&1387116137497624669> ||`,
+// || <@&1387116137497624669> ||`,
+//     };
+
+    const discordPayload = {
+      embeds: [
+        {
+          title: `🎬 ${title}`,
+          url: `https://videyb.com/e/${code}`,
+          description: `📢 New release content ygy! ||<@&1387116137497624669>||`,
+          image: { url: thumbnail },
+          color: 0xffa500, // orange, bisa kamu ganti
+          footer: {
+            text: "Posted via Ngewe",
+          },
+          timestamp: new Date().toISOString(),
+        },
+      ],
     };
 
     console.log("Mengirim:", title);

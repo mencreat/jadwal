@@ -29,20 +29,36 @@ async function markAsSent(id) {
   await sentCollection.doc(id).set({ sentAt: new Date().toISOString() });
 }
 
-async function fetchLuxFiles() {
-  const payload = {
-    key: LUX_API_KEY,
-    page_num: 1,
-    page_size: 10,
-    dir_id: LUX_DIR_ID,
-  };
+async function fetchAllLuxFiles() {
+  const pageSize = 10;
+  let page = 1;
+  let allFiles = [];
+  let hasMore = true;
 
-  const res = await axios.post(LUX_API_URL, payload);
-  return res.data.data.files || [];
+  while (hasMore) {
+    const payload = {
+      key: LUX_API_KEY,
+      page_num: page,
+      page_size: pageSize,
+      dir_id: LUX_DIR_ID,
+    };
+
+    const res = await axios.post(LUX_API_URL, payload);
+    const files = res.data.data.files || [];
+
+    allFiles = allFiles.concat(files);
+
+    const totalPages = res.data.data.total_pages;
+    page++;
+
+    if (page > totalPages) hasMore = false;
+  }
+
+  return allFiles;
 }
 
 async function main() {
-  const files = await fetchLuxFiles();
+  const files = await fetchAllLuxFiles();
 
   for (const file of files) {
     const { code, name, title, share_link, collage_screenshots, thumbnail } = file;
@@ -50,10 +66,10 @@ async function main() {
     if (await isSent(code)) continue;
 
     const discordPayload = {
-      content: `## 📢 Bokep Baru Rilis dari Luxsioab!
+      content: `## 📢 New Release Content Crot!
 🎬 **${title}**
-🔗 ${share_link}
-![thumbnail](${thumbnail})
+🔗 https://videyb.com/e/${code}
+![cover](${thumbnail})
 
 || <@&1387116137497624669> ||`,
     };
@@ -65,14 +81,15 @@ async function main() {
 
     const telegramPayload = {
       chat_id: TELEGRAM_CHAT_ID,
-      text: `📢 *Video Baru Rilis!*\n\n🎬 *${title}*\n[🔗 Tonton Sekarang](${share_link})`,
+      photo: thumbnail,
+      caption: `📢 *New Release Video ygy!*\n\n🎬 *${title}*\n[🔗 Tonton Sekarang](https://videyb.com/e/${code})`,
       parse_mode: "Markdown",
       reply_markup: {
-        inline_keyboard: [[{ text: "🎬 Watch Now", url: share_link }]],
+        inline_keyboard: [[{ text: "🎬 Watch Now", url: `https://videyb.com/e/${code}` }]],
       },
     };
 
-    await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, telegramPayload)
+    await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, telegramPayload)
       .catch(err => {
         console.error("Gagal kirim ke Telegram:", err.response?.data || err.message);
       });

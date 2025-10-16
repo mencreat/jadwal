@@ -98,7 +98,7 @@ async function main() {
     const telegramPayload = {
       chat_id: TELEGRAM_CHAT_ID,
       photo: thumbnail,
-      caption: `📢 *New Release Video ygy!*\n\n🎬 *${title}*\n[🔗 Tonton Sekarang](https://videyb.com/e/${code})`,
+      caption: `📢 *New Release Video ygy!*\n\n🎬 *${title}*\n\n🔗 YGY\nhttps://videyb.com/e/${code}`,
       parse_mode: "Markdown",
       reply_markup: {
         inline_keyboard: [[{ text: "🎬 Watch Now", url: `https://videyb.com/e/${code}` }]],

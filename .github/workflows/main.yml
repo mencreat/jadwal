@@ -1,0 +1,31 @@
+name: Kirim Konten ke Discord
+
+on:
+  schedule:
+    - cron: '0 16 * * *'   # jam 08:00 WIB
+    - cron: '0 19 * * *'  # jam 20:00 WIB
+  workflow_dispatch:
+
+jobs:
+  send-to-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run script
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FIREBASE_CREDENTIALS_B64: ${{ secrets.FIREBASE_CREDENTIALS_B64 }}
+          LUX_API_KEY: ${{ secrets.LUX_API_KEY }}
+          LUX_DIR_ID: ${{ secrets.LUX_DIR_ID }}
+        run: node schedule.js
